@@ -3117,7 +3117,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (m_spellInfo->Id == 62124 && unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
+    if (m_spellInfo->Id == 62124 && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
         m_caster->CastSpell(unitTarget, 67485, true);
 
     // Also use this effect to set the taunter's threat to the taunted creature's highest value
