@@ -960,13 +960,15 @@ public:
             {
                 DoCastVictim(SPELL_CHARGE);
                 uiChargeTimer = 7000;
-            } else uiChargeTimer -= uiDiff;
+            } else
+                uiChargeTimer -= uiDiff;
 
             if (uiShieldBreakerTimer <= uiDiff)
             {
                 DoCastVictim(SPELL_SHIELD_BREAKER);
                 uiShieldBreakerTimer = 10000;
-            } else uiShieldBreakerTimer -= uiDiff;
+            } else
+                uiShieldBreakerTimer -= uiDiff;
 
             DoMeleeAttackIfReady();
         }
@@ -1075,13 +1077,15 @@ public:
             {
                 DoCastVictim(SPELL_CHARGE);
                 uiChargeTimer = 7000;
-            } else uiChargeTimer -= uiDiff;
+            } else
+                uiChargeTimer -= uiDiff;
 
             if (uiShieldBreakerTimer <= uiDiff)
             {
                 DoCastVictim(SPELL_SHIELD_BREAKER);
                 uiShieldBreakerTimer = 10000;
-            } else uiShieldBreakerTimer -= uiDiff;
+            } else
+                uiShieldBreakerTimer -= uiDiff;
 
             DoMeleeAttackIfReady();
         }
@@ -1090,6 +1094,109 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_valiantsAI(creature);
+    }
+};
+
+/*######
+## npc_champions
+######*/
+
+enum echampions
+{
+    QUEST_AMONG_CHAMPIONS_AH                    = 13811,
+    QUEST_AMONG_CHAMPIONS_DH                    = 13814,
+    QUEST_AMONG_CHAMPIONS_AA                    = 13790,
+    QUEST_AMONG_CHAMPIONS_DA                    = 13793,
+
+    SPELL_CHARGE3                               = 63010,
+    SPELL_SHIELD_BREAKER3                       = 65147,
+
+    GOSSIP_TEXTID_CHAMPIONS                     = 14407
+};
+
+#define GOSSIP_CHAMPIONS_ITEM "I am ready to fight!"
+
+class npc_champions : public CreatureScript
+{
+public:
+    npc_champions() : CreatureScript("npc_champions") { }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (player->GetQuestStatus(QUEST_AMONG_CHAMPIONS_AH) == QUEST_STATUS_INCOMPLETE ||
+            player->GetQuestStatus(QUEST_AMONG_CHAMPIONS_DH) == QUEST_STATUS_INCOMPLETE ||
+            player->GetQuestStatus(QUEST_AMONG_CHAMPIONS_AA) == QUEST_STATUS_INCOMPLETE ||
+            player->GetQuestStatus(QUEST_AMONG_CHAMPIONS_DA) == QUEST_STATUS_INCOMPLETE)//We need more info about it.
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_CHAMPIONS_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        }
+
+        player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_CHAMPIONS, creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
+    {
+        player->PlayerTalkClass->ClearMenus();
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+        {
+            player->CLOSE_GOSSIP_MENU();
+            creature->setFaction(14);
+            creature->AI()->AttackStart(player);
+        }
+        return true;
+    }
+
+    struct npc_championsAI : public ScriptedAI
+    {
+        npc_championsAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 uiChargeTimer;
+        uint32 uiShieldBreakerTimer;
+
+        void Reset() override
+        {
+            uiChargeTimer = 7000;
+            uiShieldBreakerTimer = 10000;
+        }
+
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
+        {
+            if (uiDamage > me->GetHealth() && pDoneBy->GetTypeId() == TYPEID_PLAYER)
+            {
+                uiDamage = 0;
+                pDoneBy->ToPlayer()->AddItem(45500, 1);
+                me->setFaction(35);
+                EnterEvadeMode();
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (uiChargeTimer <= uiDiff)
+            {
+                DoCastVictim(SPELL_CHARGE);
+                uiChargeTimer = 7000;
+            } else
+                uiChargeTimer -= uiDiff;
+
+            if (uiShieldBreakerTimer <= uiDiff)
+            {
+                DoCastVictim(SPELL_SHIELD_BREAKER);
+                uiShieldBreakerTimer = 10000;
+            } else
+                uiShieldBreakerTimer -= uiDiff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_championsAI(creature);
     }
 };
 
@@ -1104,4 +1211,5 @@ void AddSC_icecrown()
     new npc_squire_danny;
     new npc_argent_champion;
     new npc_valiants;
+    new npc_champions;
 }
