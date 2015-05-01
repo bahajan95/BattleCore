@@ -1517,12 +1517,10 @@ class npc_valkyr_shadowguard : public CreatureScript
 						if (me->GetExactDist2d(&_dropPoint) > 3.0f)
 						{
 							_events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 200);
+                            break;
 						}
-						else
-						{
                         DoCastAOE(SPELL_EJECT_ALL_PASSENGERS);
                         me->DespawnOrUnsummon(1000);
-						}
                         break;
                     case POINT_CHARGE:
                         if (Player* target = ObjectAccessor::GetPlayer(*me, _grabbedPlayer))
@@ -3240,6 +3238,39 @@ class achievement_neck_deep_in_vile : public AchievementCriteriaScript
         }
 };
 
+// 74399 - Charge (LK Valk)
+class TW_spell_icc_valk_charge : public SpellScriptLoader
+{
+public:
+    TW_spell_icc_valk_charge() : SpellScriptLoader("TW_spell_icc_valk_charge") { }
+
+    class TW_spell_icc_valk_charge_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(TW_spell_icc_valk_charge_SpellScript);
+
+        void ChargeDest(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            Position destPos = GetHitDest()->GetPosition();
+            float angle = GetCaster()->GetRelativeAngle(destPos.GetPositionX(), destPos.GetPositionY());
+            float dist = GetCaster()->GetDistance2d(destPos.GetPositionX(), destPos.GetPositionY());
+            Position hitXY = GetCaster()->GetFirstCollisionPosition(dist, angle);
+
+            GetCaster()->GetMotionMaster()->MoveCharge(hitXY.m_positionX, hitXY.m_positionY, destPos.m_positionZ);
+        }
+
+        void Register() override
+        {
+            OnEffectLaunch += SpellEffectFn(TW_spell_icc_valk_charge_SpellScript::ChargeDest, EFFECT_0, SPELL_EFFECT_CHARGE_DEST);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new TW_spell_icc_valk_charge_SpellScript();
+    }
+};
+
 void AddSC_boss_the_lich_king()
 {
     new boss_the_lich_king();
@@ -3282,6 +3313,8 @@ void AddSC_boss_the_lich_king()
     new spell_the_lich_king_jump_remove_aura();
     new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
     new spell_the_lich_king_play_movie();
+    new TW_spell_icc_valk_charge();
+
     new achievement_been_waiting_long_time();
     new achievement_neck_deep_in_vile();
 }
