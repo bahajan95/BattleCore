@@ -363,9 +363,10 @@ DELETE FROM `spell_target_position` WHERE `id`='70746';
 INSERT INTO `spell_target_position`(`id`,`target_map`,`target_position_x` ,`target_position_y`,`target_position_z`,`target_orientation`) VALUES
 ('70746', '580', '1788.911865', '648.928284', '71.204185', '2.171664');
 
-DELETE FROM `event_scripts` WHERE `id`=22833;
+DELETE FROM `event_scripts` WHERE `id` in (22833, 22854);
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES 
-('22833', '0', '10', '37745', '15000', '0', '1692.225', '615.916', '27.935', '0.927');
+('22833', '0', '10', '37745', '15000', '0', '1692.225', '615.916', '27.935', '0.927'),
+('22854', '0', '10', '37745', '15000', '0', '1692.225', '615.916', '27.935', '0.927');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid`=37745 AND `source_type`=0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 

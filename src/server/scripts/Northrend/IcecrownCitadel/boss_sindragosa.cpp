@@ -513,7 +513,7 @@ class boss_sindragosa : public CreatureScript
                             destZ = 205.0f; // random number close to ground, get exact in next call
                             me->UpdateGroundPositionZ(destX, destY, destZ);
                             me->CastSpell(destX, destY, destZ, SPELL_FROST_BOMB_TRIGGER, false);
-                            events.ScheduleEvent(EVENT_FROST_BOMB, urand(6000, 8000));
+                            events.ScheduleEvent(EVENT_FROST_BOMB, urand(8000, 10000));
                             break;
                         }
                         case EVENT_LAND:
