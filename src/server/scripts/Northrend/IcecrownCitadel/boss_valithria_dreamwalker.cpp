@@ -386,6 +386,9 @@ class boss_valithria_dreamwalker : public CreatureScript
                             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
                             if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
                                 trigger->AI()->DoAction(ACTION_DEATH);
+
+                            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
+                                lichKing->AI()->EnterEvadeMode();
                         }
                     }
                 }
